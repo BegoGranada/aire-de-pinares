@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Gestor — Aire de Pinares</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Cormorant Garamond', 'Georgia', 'serif'],
+            body:    ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            pine: { 50:'#f0f5f0',100:'#d6e8d6',200:'#aed0ae',300:'#7fb57f',500:'#3a6033',700:'#2b4824',800:'#1e3019',900:'#1a261b',950:'#0d1510' },
+            wood: { 100:'#f5e6d3',200:'#e8c99a',300:'#d4a878',400:'#c08852',500:'#b07a45',600:'#8f5f30',700:'#6e4420' },
+            cream: '#faf6ef',
+            stone: { 150:'#ece7df',300:'#d4cdc5',500:'#a09890',600:'#7a726a',700:'#504840' },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body { font-family: 'Inter', system-ui, sans-serif; height: 100%; margin: 0; background: #f0f5f0; }
+
+    /* Sidebar */
+    #sidebar { transition: transform 0.3s ease; }
+
+    /* Calendar */
+    .cal-day { min-width: 36px; }
+    .cal-day.today { background: rgba(176,122,69,0.15); border-radius: 4px; }
+    .reserva-bar {
+      position: absolute; left: 2px; right: 2px;
+      height: 22px; border-radius: 3px;
+      display: flex; align-items: center;
+      padding: 0 6px; font-size: 11px;
+      font-weight: 500; overflow: hidden;
+      white-space: nowrap; text-overflow: ellipsis;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .reserva-bar:hover { opacity: 0.85; }
+    .bar-confirmada { background: #2b4824; color: #d4a878; }
+    .bar-pendiente  { background: #b07a45; color: #fff; }
+    .bar-cancelada  { background: #7a726a; color: #fff; opacity: 0.7; }
+
+    /* Scroll calendar */
+    #cal-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #cal-scroll::-webkit-scrollbar { height: 4px; }
+    #cal-scroll::-webkit-scrollbar-thumb { background: #d4a878; border-radius: 2px; }
+
+    /* Modal */
+    #modal-overlay { background: rgba(13,21,16,0.72); }
+
+    /* Chart bars */
+    .chart-bar-ing { background: #2b4824; }
+    .chart-bar-gas { background: #b07a45; }
+
+    /* Estado pills */
+    .pill-confirmada { background: #d6e8d6; color: #1e3019; }
+    .pill-pendiente  { background: #f5e6d3; color: #6e4420; }
+    .pill-cancelada  { background: #ece7df; color: #7a726a; }
+
+    /* Tab active */
+    .tab-btn.active { background: #1a261b; color: #d4a878; }
+    .tab-btn { transition: background 0.2s, color 0.2s; }
+
+    /* Animate in */
+    .fade-in { animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Input focus */
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #b07a45;
+      outline-offset: 1px;
+    }
+  </style>
+</head>
+<body class="bg-pine-50">
+
+<!-- ═══ LAYOUT WRAPPER ══════════════════════════════════════════ -->
+<div class="flex h-screen overflow-hidden">
+
+  <!-- ═══ SIDEBAR (desktop) ═══════════════════════════════════════ -->
+  <aside id="sidebar" class="hidden lg:flex flex-col w-56 bg-pine-900 text-white shrink-0">
+    <!-- Logo -->
+    <div class="px-5 py-5 border-b border-pine-800">
+      <a href="index.html" class="flex items-center gap-2 text-white hover:text-wood-300 transition-colors">
+        <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+          <path d="M16 3L3 28h26L16 3z" fill="#d4a878" opacity="0.9"/>
+          <rect x="13" y="20" width="6" height="8" fill="#6e4420"/>
+        </svg>
+        <span class="font-display text-base font-semibold leading-tight">Aire de<br><span class="text-wood-300">Pinares</span></span>
+      </a>
+    </div>
+    <div class="px-4 py-3 border-b border-pine-800">
+      <p class="text-stone-500 text-xs uppercase tracking-wider">Propietarios</p>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <button onclick="irA('calendario')" data-tab="calendario"
+        class="tab-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium">
+        <span class="text-lg">📅</span> Calendario
+      </button>
+      <button onclick="irA('reservas')" data-tab="reservas"
+        class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-stone-300 hover:text-white hover:bg-pine-800">
+        <span class="text-lg">📋</span> Reservas
+      </button>
+      <button onclick="irA('precios')" data-tab="precios"
+        class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-stone-300 hover:text-white hover:bg-pine-800">
+        <span class="text-lg">💶</span> Precios
+      </button>
+      <button onclick="irA('finanzas')" data-tab="finanzas"
+        class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-stone-300 hover:text-white hover:bg-pine-800">
+        <span class="text-lg">📊</span> Finanzas
+      </button>
+    </nav>
+
+    <!-- Footer sidebar -->
+    <div class="px-4 py-4 border-t border-pine-800">
+      <p class="text-stone-600 text-xs">646 61 10 28</p>
+      <p class="text-stone-600 text-xs">669 04 88 73</p>
+      <a href="index.html" class="text-stone-500 hover:text-stone-300 text-xs mt-2 block transition-colors">← Web pública</a>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN CONTENT ═══════════════════════════════════════════ -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+    <!-- Top bar -->
+    <header class="bg-pine-900 lg:bg-white border-b border-pine-800 lg:border-stone-150 px-4 lg:px-6 h-14 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <!-- Mobile logo -->
+        <a href="index.html" class="lg:hidden flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+            <path d="M16 3L3 28h26L16 3z" fill="#d4a878" opacity="0.9"/>
+            <rect x="13" y="20" width="6" height="8" fill="#6e4420"/>
+          </svg>
+          <span class="font-display text-sm font-semibold text-white">Aire de Pinares</span>
+        </a>
+        <!-- Desktop title -->
+        <h1 id="page-title" class="hidden lg:block font-display text-xl font-semibold text-pine-900">Calendario</h1>
+      </div>
+
+      <button onclick="nuevaReserva()"
+        class="flex items-center gap-1.5 bg-wood-500 hover:bg-wood-600 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva reserva
+      </button>
+    </header>
+
+    <!-- Scrollable main area -->
+    <main class="flex-1 overflow-y-auto pb-20 lg:pb-0">
+
+      <!-- ═══ CALENDARIO ══════════════════════════════════════════ -->
+      <div id="tab-calendario" class="p-4 lg:p-6 fade-in">
+
+        <!-- Month nav -->
+        <div class="flex items-center justify-between mb-4">
+          <button onclick="cambiarMes(-1)" class="p-2 hover:bg-stone-150 rounded transition-colors text-pine-900">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="text-center">
+            <h2 id="cal-titulo" class="font-display text-2xl font-semibold text-pine-900"></h2>
+          </div>
+          <button onclick="cambiarMes(1)" class="p-2 hover:bg-stone-150 rounded transition-colors text-pine-900">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Stats mes -->
+        <div id="cal-stats" class="grid grid-cols-3 gap-3 mb-5"></div>
+
+        <!-- Calendar grid (días semana + celdas) -->
+        <div class="bg-white rounded-lg shadow-sm border border-stone-150 overflow-hidden">
+          <!-- Header días semana -->
+          <div class="grid grid-cols-7 bg-pine-900">
+            <div class="py-2 text-center text-xs font-medium text-stone-300">Lun</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300">Mar</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300">Mié</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300">Jue</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300">Vie</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300 text-wood-300">Sáb</div>
+            <div class="py-2 text-center text-xs font-medium text-stone-300 text-wood-300">Dom</div>
+          </div>
+          <!-- Celdas -->
+          <div id="cal-grid" class="grid grid-cols-7"></div>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="flex flex-wrap gap-4 mt-4 text-xs text-stone-600">
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bar-confirmada"></div> Confirmada</div>
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bar-pendiente"></div> Pendiente</div>
+          <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bar-cancelada"></div> Cancelada</div>
+        </div>
+      </div>
+
+      <!-- ═══ RESERVAS ════════════════════════════════════════════ -->
+      <div id="tab-reservas" class="hidden p-4 lg:p-6 fade-in">
+
+        <!-- Filtros -->
+        <div class="flex flex-wrap gap-3 mb-5">
+          <select id="filtro-estado" onchange="renderReservas()" class="text-sm border border-stone-300 rounded px-3 py-2 bg-white text-pine-900">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+          <input id="filtro-busca" type="text" placeholder="Buscar huésped…"
+            oninput="renderReservas()"
+            class="text-sm border border-stone-300 rounded px-3 py-2 bg-white text-pine-900 flex-1 min-w-32">
+          <button onclick="exportarCSV()"
+            class="flex items-center gap-1.5 border border-stone-300 hover:border-wood-500 text-pine-900 text-sm px-3 py-2 rounded transition-colors">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Exportar CSV
+          </button>
+        </div>
+
+        <!-- Lista reservas -->
+        <div id="lista-reservas" class="space-y-3"></div>
+      </div>
+
+      <!-- ═══ PRECIOS ══════════════════════════════════════════════ -->
+      <div id="tab-precios" class="hidden p-4 lg:p-6 fade-in">
+        <div class="max-w-2xl">
+          <p class="text-stone-600 text-sm mb-6">Configura el precio por noche según la temporada. El gestor calculará automáticamente el importe de cada reserva.</p>
+
+          <div id="lista-temporadas" class="space-y-4 mb-6"></div>
+
+          <button onclick="nuevaTemporada()"
+            class="flex items-center gap-2 border-2 border-dashed border-stone-300 hover:border-wood-400 text-stone-600 hover:text-wood-600 text-sm font-medium px-4 py-3 rounded w-full justify-center transition-colors">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Añadir temporada
+          </button>
+
+          <div class="mt-8 bg-pine-900 rounded-lg p-5 text-white">
+            <h3 class="font-display text-lg font-semibold mb-3">Normas de la casa</h3>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="flex items-center gap-2 text-stone-300"><span>✅</span> Entrada a las 15:00</div>
+              <div class="flex items-center gap-2 text-stone-300"><span>🕙</span> Salida a las 10:00</div>
+              <div class="flex items-center gap-2 text-stone-300"><span>⛔</span> No se admiten mascotas</div>
+              <div class="flex items-center gap-2 text-stone-300"><span>⛔</span> No fumar</div>
+              <div class="flex items-center gap-2 text-stone-300"><span>👥</span> Máx. 10 personas</div>
+              <div class="flex items-center gap-2 text-stone-300"><span>🏠</span> Alquiler íntegro</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FINANZAS ═════════════════════════════════════════════ -->
+      <div id="tab-finanzas" class="hidden p-4 lg:p-6 fade-in">
+        <!-- KPIs -->
+        <div id="fin-kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"></div>
+
+        <!-- Gráfico 6 meses -->
+        <div class="bg-white rounded-lg border border-stone-150 p-5 mb-6">
+          <h3 class="font-display text-lg font-semibold text-pine-900 mb-4">Ingresos vs Gastos — últimos 6 meses</h3>
+          <div id="grafico" class="space-y-3"></div>
+          <div class="flex gap-4 mt-4 text-xs text-stone-600">
+            <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded chart-bar-ing"></div> Ingresos</div>
+            <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded chart-bar-gas"></div> Gastos</div>
+          </div>
+        </div>
+
+        <!-- Gastos -->
+        <div class="bg-white rounded-lg border border-stone-150 p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display text-lg font-semibold text-pine-900">Gastos</h3>
+            <button onclick="nuevoGasto()"
+              class="flex items-center gap-1 text-wood-500 hover:text-wood-700 text-sm font-medium transition-colors">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Añadir gasto
+            </button>
+          </div>
+          <div id="lista-gastos" class="space-y-2"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Mobile bottom nav -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-pine-900 border-t border-pine-800 flex safe-area-inset-bottom">
+      <button onclick="irA('calendario')" data-tab="calendario"
+        class="tab-btn active flex-1 flex flex-col items-center py-2.5 text-wood-300 text-xs gap-1">
+        <span class="text-xl">📅</span>
+        <span class="font-medium">Calendario</span>
+      </button>
+      <button onclick="irA('reservas')" data-tab="reservas"
+        class="tab-btn flex-1 flex flex-col items-center py-2.5 text-stone-500 text-xs gap-1">
+        <span class="text-xl">📋</span>
+        <span>Reservas</span>
+      </button>
+      <button onclick="irA('precios')" data-tab="precios"
+        class="tab-btn flex-1 flex flex-col items-center py-2.5 text-stone-500 text-xs gap-1">
+        <span class="text-xl">💶</span>
+        <span>Precios</span>
+      </button>
+      <button onclick="irA('finanzas')" data-tab="finanzas"
+        class="tab-btn flex-1 flex flex-col items-center py-2.5 text-stone-500 text-xs gap-1">
+        <span class="text-xl">📊</span>
+        <span>Finanzas</span>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- ═══ MODAL RESERVA ═══════════════════════════════════════════════ -->
+<div id="modal-overlay" class="hidden fixed inset-0 z-50 flex items-end lg:items-center justify-center p-0 lg:p-4">
+  <div id="modal-box" class="bg-white w-full lg:max-w-2xl max-h-[92vh] lg:rounded-xl overflow-y-auto shadow-2xl">
+
+    <!-- Modal header -->
+    <div class="sticky top-0 bg-pine-900 text-white px-5 py-4 flex items-center justify-between">
+      <h2 id="modal-titulo" class="font-display text-xl font-semibold">Nueva reserva</h2>
+      <button onclick="cerrarModal()" class="text-stone-300 hover:text-white p-1 transition-colors">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="p-5 space-y-5">
+
+      <!-- Estado -->
+      <div class="flex gap-2">
+        <button onclick="setEstado('pendiente')" id="btn-pendiente"
+          class="flex-1 py-2 rounded text-sm font-medium border-2 border-wood-500 bg-wood-100 text-wood-700">Pendiente</button>
+        <button onclick="setEstado('confirmada')" id="btn-confirmada"
+          class="flex-1 py-2 rounded text-sm font-medium border-2 border-transparent bg-stone-150 text-stone-600">Confirmada</button>
+        <button onclick="setEstado('cancelada')" id="btn-cancelada"
+          class="flex-1 py-2 rounded text-sm font-medium border-2 border-transparent bg-stone-150 text-stone-600">Cancelada</button>
+      </div>
+
+      <!-- Fechas y personas -->
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-stone-600 mb-1">Entrada</label>
+          <input type="date" id="f-entrada" onchange="calcularPrecio()"
+            class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-stone-600 mb-1">Salida</label>
+          <input type="date" id="f-salida" onchange="calcularPrecio()"
+            class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-stone-600 mb-1">Personas</label>
+          <input type="number" id="f-personas" min="1" max="10" value="2"
+            class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+        </div>
+      </div>
+
+      <!-- Precio calculado -->
+      <div id="precio-calc" class="hidden bg-pine-50 rounded-lg p-4 flex items-center justify-between">
+        <div>
+          <div class="text-stone-600 text-xs">Precio estimado</div>
+          <div id="precio-num" class="font-display text-2xl font-semibold text-pine-900">—</div>
+          <div id="precio-det" class="text-stone-500 text-xs"></div>
+        </div>
+        <div class="text-right">
+          <div class="text-stone-600 text-xs">Pagado</div>
+          <input type="number" id="f-pagado" min="0" placeholder="0"
+            class="w-28 text-right border border-stone-300 rounded px-2 py-1 text-sm font-semibold text-pine-900 mt-1">
+          <div class="text-stone-500 text-xs mt-0.5">€</div>
+        </div>
+      </div>
+
+      <!-- Datos huésped -->
+      <div class="border-t border-stone-150 pt-4">
+        <h3 class="text-sm font-semibold text-pine-900 mb-3">Datos del huésped principal</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-stone-600 mb-1">Nombre completo *</label>
+            <input type="text" id="f-nombre" placeholder="Nombre y apellidos"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Teléfono *</label>
+            <input type="tel" id="f-telefono" placeholder="6XX XXX XXX"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Email</label>
+            <input type="email" id="f-email" placeholder="correo@ejemplo.com"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Tipo documento</label>
+            <select id="f-doc-tipo" onchange="validarDoc()"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900 bg-white">
+              <option value="DNI">DNI</option>
+              <option value="NIE">NIE</option>
+              <option value="Pasaporte">Pasaporte</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Número documento</label>
+            <input type="text" id="f-doc-num" placeholder="12345678A" oninput="validarDoc()"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900 uppercase">
+            <p id="doc-error" class="text-red-500 text-xs mt-1 hidden"></p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Fecha nacimiento</label>
+            <input type="date" id="f-nacimiento"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Nacionalidad</label>
+            <input type="text" id="f-nacion" value="Española" placeholder="Española"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+        </div>
+      </div>
+
+      <!-- Pago -->
+      <div class="border-t border-stone-150 pt-4">
+        <h3 class="text-sm font-semibold text-pine-900 mb-3">Método de pago</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Método</label>
+            <select id="f-pago-metodo"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900 bg-white">
+              <option value="Bizum">Bizum</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Booking">Booking</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-600 mb-1">Fecha pago</label>
+            <input type="date" id="f-pago-fecha"
+              class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      <div class="border-t border-stone-150 pt-4">
+        <label class="block text-xs font-medium text-stone-600 mb-1">Notas internas</label>
+        <textarea id="f-notas" rows="2" placeholder="Observaciones, peticiones especiales…"
+          class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900 resize-none"></textarea>
+      </div>
+
+      <!-- Acciones SES -->
+      <div id="ses-bloque" class="hidden border-t border-stone-150 pt-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-pine-900">Viajeros — SES.Hospedajes (RD 933/2021)</h3>
+          <button onclick="addViajero()" class="text-wood-500 hover:text-wood-700 text-xs font-medium transition-colors">+ Añadir viajero</button>
+        </div>
+        <div id="lista-viajeros" class="space-y-2"></div>
+      </div>
+
+    </div>
+
+    <!-- Modal footer -->
+    <div class="sticky bottom-0 bg-white border-t border-stone-150 px-5 py-4 flex gap-3">
+      <button id="btn-eliminar" onclick="eliminarReserva()" class="hidden text-red-500 hover:text-red-700 text-sm font-medium px-3 py-2 transition-colors">
+        Eliminar
+      </button>
+      <div class="flex-1"></div>
+      <button onclick="cerrarModal()" class="border border-stone-300 text-stone-600 hover:text-pine-900 text-sm font-medium px-5 py-2 rounded transition-colors">
+        Cancelar
+      </button>
+      <button onclick="guardarReserva()"
+        class="bg-pine-900 hover:bg-pine-800 text-white text-sm font-semibold px-6 py-2 rounded transition-colors flex items-center gap-2">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL GASTO ══════════════════════════════════════════════════ -->
+<div id="modal-gasto" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(13,21,16,0.72)">
+  <div class="bg-white rounded-xl w-full max-w-sm shadow-2xl">
+    <div class="bg-pine-900 text-white px-5 py-4 rounded-t-xl flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold">Nuevo gasto</h2>
+      <button onclick="cerrarGasto()" class="text-stone-300 hover:text-white transition-colors">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-stone-600 mb-1">Concepto *</label>
+        <input type="text" id="g-concepto" placeholder="Limpieza, leña, suministros…"
+          class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-stone-600 mb-1">Importe (€) *</label>
+          <input type="number" id="g-importe" min="0" step="0.01" placeholder="0.00"
+            class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-stone-600 mb-1">Fecha *</label>
+          <input type="date" id="g-fecha"
+            class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-stone-600 mb-1">Categoría</label>
+        <select id="g-cat" class="w-full border border-stone-300 rounded px-3 py-2 text-sm text-pine-900 bg-white">
+          <option>Limpieza</option>
+          <option>Suministros</option>
+          <option>Leña</option>
+          <option>Mantenimiento</option>
+          <option>Jardinería</option>
+          <option>Seguros</option>
+          <option>IBI/Tasas</option>
+          <option>Otros</option>
+        </select>
+      </div>
+    </div>
+    <div class="px-5 pb-5 flex gap-3 justify-end">
+      <button onclick="cerrarGasto()" class="border border-stone-300 text-stone-600 text-sm px-4 py-2 rounded transition-colors">Cancelar</button>
+      <button onclick="guardarGasto()" class="bg-pine-900 hover:bg-pine-800 text-white text-sm font-semibold px-5 py-2 rounded transition-colors">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  DATOS Y PERSISTENCIA
+// ═══════════════════════════════════════════════════════════════════
+
+const CLAVE = 'adp-gestor-v1';
+
+function cargar() {
+  try {
+    const raw = localStorage.getItem(CLAVE);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return datosDemo();
+}
+
+function guardar(d) {
+  try { localStorage.setItem(CLAVE, JSON.stringify(d)); } catch(e) {}
+}
+
+function datosDemo() {
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = hoy.getMonth();
+
+  // Reservas de ejemplo
+  const reservas = [
+    {
+      id: uid(), estado: 'confirmada',
+      entrada: fmtFecha(new Date(año, mes, 5)),
+      salida:  fmtFecha(new Date(año, mes, 8)),
+      personas: 6, nombre: 'Familia García Ruiz',
+      telefono: '620111222', email: 'garcia@email.com',
+      docTipo: 'DNI', docNum: '12345678Z',
+      nacimiento: '1978-04-12', nacion: 'Española',
+      pagoMetodo: 'Bizum', pagoFecha: fmtFecha(new Date(año, mes-1, 20)),
+      pagado: 640, notas: 'Celebran un cumpleaños',
+      viajeros: [], creada: new Date().toISOString(),
+    },
+    {
+      id: uid(), estado: 'pendiente',
+      entrada: fmtFecha(new Date(año, mes, 14)),
+      salida:  fmtFecha(new Date(año, mes, 17)),
+      personas: 4, nombre: 'Marta López',
+      telefono: '630333444', email: 'marta@email.com',
+      docTipo: 'DNI', docNum: '87654321X',
+      nacimiento: '1985-09-03', nacion: 'Española',
+      pagoMetodo: 'Transferencia', pagoFecha: '',
+      pagado: 0, notas: '',
+      viajeros: [], creada: new Date().toISOString(),
+    },
+    {
+      id: uid(), estado: 'confirmada',
+      entrada: fmtFecha(new Date(año, mes, 21)),
+      salida:  fmtFecha(new Date(año, mes, 24)),
+      personas: 8, nombre: 'Grupo Peñaranda',
+      telefono: '645555666', email: '',
+      docTipo: 'DNI', docNum: '11111111H',
+      nacimiento: '1972-12-01', nacion: 'Española',
+      pagoMetodo: 'Efectivo', pagoFecha: fmtFecha(new Date(año, mes, 1)),
+      pagado: 900, notas: 'Traen kayak propio',
+      viajeros: [], creada: new Date().toISOString(),
+    },
+  ];
+
+  const temporadas = [
+    { id: uid(), nombre: 'Temporada Baja', precioNoche: 250, meses: [1,2,11] },
+    { id: uid(), nombre: 'Temporada Media', precioNoche: 320, meses: [3,4,5,10] },
+    { id: uid(), nombre: 'Temporada Alta', precioNoche: 420, meses: [6,7,8,9] },
+    { id: uid(), nombre: 'Puentes y Navidad', precioNoche: 580, meses: [] },
+  ];
+
+  // Gastos últimos meses
+  const gastos = [];
+  for (let m = 0; m < 4; m++) {
+    const d = new Date(año, mes - m, 10);
+    gastos.push({ id: uid(), concepto: 'Limpieza', importe: 80, fecha: fmtFecha(d), cat: 'Limpieza' });
+    if (m < 3) gastos.push({ id: uid(), concepto: 'Suministros luz/agua', importe: 120, fecha: fmtFecha(new Date(año, mes-m, 20)), cat: 'Suministros' });
+  }
+  gastos.push({ id: uid(), concepto: 'Leña invierno', importe: 150, fecha: fmtFecha(new Date(año, mes-1, 5)), cat: 'Leña' });
+
+  return { reservas, temporadas, gastos };
+}
+
+let D = cargar();
+
+// ═══════════════════════════════════════════════════════════════════
+//  UTILIDADES
+// ═══════════════════════════════════════════════════════════════════
+
+function uid() { return Math.random().toString(36).slice(2); }
+
+function fmtFecha(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function fmtEuropeo(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function diasEntre(e, s) {
+  const de = new Date(e), ds = new Date(s);
+  return Math.max(0, Math.round((ds - de) / 86400000));
+}
+
+function precioReserva(r) {
+  if (!r.entrada || !r.salida) return 0;
+  const noches = diasEntre(r.entrada, r.salida);
+  const mesEntrada = new Date(r.entrada).getMonth() + 1; // 1-12
+  const t = D.temporadas.find(t => t.meses.includes(mesEntrada)) || D.temporadas[0];
+  return noches * (t ? t.precioNoche : 300);
+}
+
+function nombreMes(m) {
+  return ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][m];
+}
+
+// Validación documentos
+function validarDNI(v) {
+  const m = v.trim().match(/^(\d{8})([A-Z])$/i);
+  if (!m) return false;
+  return 'TRWAGMYFPDXBNJZSQVHLCKE'[parseInt(m[1]) % 23] === m[2].toUpperCase();
+}
+function validarNIE(v) {
+  const m = v.trim().match(/^([XYZ])(\d{7})([A-Z])$/i);
+  if (!m) return false;
+  const n = v.replace(/^X/i,'0').replace(/^Y/i,'1').replace(/^Z/i,'2');
+  return 'TRWAGMYFPDXBNJZSQVHLCKE'[parseInt(n.slice(0,-1)) % 23] === m[3].toUpperCase();
+}
+function validarPasaporte(v) { return /^[A-Z0-9]{5,20}$/i.test(v.trim()); }
+
+// ═══════════════════════════════════════════════════════════════════
+//  NAVEGACIÓN ENTRE TABS
+// ═══════════════════════════════════════════════════════════════════
+
+let tabActual = 'calendario';
+
+function irA(tab) {
+  tabActual = tab;
+
+  // Ocultar todos los tabs
+  ['calendario','reservas','precios','finanzas'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) { el.classList.add('hidden'); el.classList.remove('fade-in'); }
+  });
+
+  // Mostrar tab activo
+  const el = document.getElementById('tab-' + tab);
+  if (el) { el.classList.remove('hidden'); requestAnimationFrame(() => el.classList.add('fade-in')); }
+
+  // Actualizar botones
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const isActive = btn.dataset.tab === tab;
+    btn.classList.toggle('active', isActive);
+    if (isActive) {
+      btn.classList.add('text-wood-300');
+      btn.classList.remove('text-stone-300', 'text-stone-500', 'hover:text-white', 'hover:bg-pine-800');
+    } else {
+      btn.classList.remove('text-wood-300');
+      btn.classList.add('text-stone-300', 'hover:text-white');
+    }
+  });
+
+  // Título desktop
+  const titulos = { calendario: 'Calendario', reservas: 'Reservas', precios: 'Precios y normas', finanzas: 'Finanzas' };
+  const tEl = document.getElementById('page-title');
+  if (tEl) tEl.textContent = titulos[tab] || tab;
+
+  // Render específico
+  if (tab === 'calendario') renderCalendario();
+  if (tab === 'reservas') renderReservas();
+  if (tab === 'precios') renderPrecios();
+  if (tab === 'finanzas') renderFinanzas();
+
+  // URL hash
+  history.replaceState(null, '', '#' + tab);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CALENDARIO
+// ═══════════════════════════════════════════════════════════════════
+
+let calAño = new Date().getFullYear();
+let calMes = new Date().getMonth();
+
+function cambiarMes(d) {
+  calMes += d;
+  if (calMes > 11) { calMes = 0; calAño++; }
+  if (calMes < 0)  { calMes = 11; calAño--; }
+  renderCalendario();
+}
+
+function renderCalendario() {
+  // Título
+  document.getElementById('cal-titulo').textContent = `${nombreMes(calMes)} ${calAño}`;
+
+  // Stats mes
+  const reservasMes = D.reservas.filter(r => {
+    if (r.estado === 'cancelada') return false;
+    const e = new Date(r.entrada), s = new Date(r.salida);
+    const ini = new Date(calAño, calMes, 1), fin = new Date(calAño, calMes + 1, 0);
+    return e <= fin && s >= ini;
+  });
+  const ingresosMes = reservasMes.filter(r => r.estado === 'confirmada').reduce((a, r) => a + precioReserva(r), 0);
+  const diasOcupados = calcDiasOcupados(calAño, calMes);
+
+  document.getElementById('cal-stats').innerHTML = `
+    <div class="bg-white rounded-lg border border-stone-150 p-3 text-center">
+      <div class="font-display text-2xl font-semibold text-pine-900">${reservasMes.length}</div>
+      <div class="text-stone-600 text-xs mt-0.5">reservas</div>
+    </div>
+    <div class="bg-white rounded-lg border border-stone-150 p-3 text-center">
+      <div class="font-display text-2xl font-semibold text-pine-900">${diasOcupados}</div>
+      <div class="text-stone-600 text-xs mt-0.5">días ocupados</div>
+    </div>
+    <div class="bg-white rounded-lg border border-stone-150 p-3 text-center">
+      <div class="font-display text-2xl font-semibold text-wood-500">${ingresosMes.toLocaleString('es-ES')} €</div>
+      <div class="text-stone-600 text-xs mt-0.5">ingresos</div>
+    </div>
+  `;
+
+  // Grid días
+  const primerDia = new Date(calAño, calMes, 1);
+  let diaInicio = primerDia.getDay() - 1; // 0=Lun
+  if (diaInicio < 0) diaInicio = 6;
+  const ultimoDia = new Date(calAño, calMes + 1, 0).getDate();
+  const hoy = new Date();
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Celdas vacías inicio
+  for (let i = 0; i < diaInicio; i++) {
+    grid.insertAdjacentHTML('beforeend', '<div class="h-16 lg:h-20 border-r border-b border-stone-100 bg-stone-50 opacity-40"></div>');
+  }
+
+  // Días del mes
+  for (let d = 1; d <= ultimoDia; d++) {
+    const fecha = fmtFecha(new Date(calAño, calMes, d));
+    const esHoy = hoy.getFullYear() === calAño && hoy.getMonth() === calMes && hoy.getDate() === d;
+    const reservas = D.reservas.filter(r => r.entrada <= fecha && r.salida > fecha && r.estado !== 'cancelada');
+    const diasem = (diaInicio + d - 1) % 7; // 0=Lun, 6=Dom
+    const esFind = diasem >= 5;
+
+    let barrasHtml = '';
+    reservas.slice(0, 2).forEach(r => {
+      const cls = r.estado === 'confirmada' ? 'bar-confirmada' : 'bar-pendiente';
+      barrasHtml += `<div class="reserva-bar ${cls} text-xs" onclick="abrirReserva('${r.id}')" title="${r.nombre}">${r.nombre.split(' ')[0]}</div>`;
+    });
+    if (reservas.length > 2) barrasHtml += `<div class="text-xs text-stone-500 px-1">+${reservas.length-2} más</div>`;
+
+    const bgClass = esHoy ? 'bg-wood-100 ring-1 ring-wood-400' : esFind ? 'bg-stone-50' : 'bg-white';
+    const numClass = esHoy ? 'text-wood-700 font-bold' : esFind ? 'text-wood-600 font-medium' : 'text-pine-900';
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="h-16 lg:h-24 border-r border-b border-stone-100 ${bgClass} p-1 relative cursor-pointer hover:bg-pine-50 transition-colors"
+           onclick="diaClick('${fecha}', event)">
+        <div class="text-xs ${numClass} leading-none mb-1 select-none">${d}</div>
+        <div class="space-y-0.5 relative">${barrasHtml}</div>
+      </div>
+    `);
+  }
+}
+
+function calcDiasOcupados(año, mes) {
+  let dias = 0;
+  const ult = new Date(año, mes + 1, 0).getDate();
+  for (let d = 1; d <= ult; d++) {
+    const fecha = fmtFecha(new Date(año, mes, d));
+    const ocupado = D.reservas.some(r => r.estado !== 'cancelada' && r.entrada <= fecha && r.salida > fecha);
+    if (ocupado) dias++;
+  }
+  return dias;
+}
+
+function diaClick(fecha, ev) {
+  if (ev.target.classList.contains('reserva-bar')) return;
+  // Abrir nueva reserva pre-llenando la fecha
+  nuevaReserva(fecha);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RESERVAS — LISTA
+// ═══════════════════════════════════════════════════════════════════
+
+function renderReservas() {
+  const filEst = document.getElementById('filtro-estado').value;
+  const filBus = document.getElementById('filtro-busca').value.toLowerCase();
+
+  let lista = [...D.reservas].sort((a, b) => b.entrada.localeCompare(a.entrada));
+  if (filEst) lista = lista.filter(r => r.estado === filEst);
+  if (filBus) lista = lista.filter(r => r.nombre.toLowerCase().includes(filBus) || r.telefono.includes(filBus));
+
+  const el = document.getElementById('lista-reservas');
+  if (!lista.length) {
+    el.innerHTML = `<div class="text-center text-stone-500 py-12">
+      <div class="text-4xl mb-3">📋</div>
+      <p class="text-sm">No hay reservas${filEst || filBus ? ' con esos filtros' : ''}.</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = lista.map(r => {
+    const noches = diasEntre(r.entrada, r.salida);
+    const total = precioReserva(r);
+    const pendiente = total - (r.pagado || 0);
+    const pillCls = r.estado === 'confirmada' ? 'pill-confirmada' : r.estado === 'pendiente' ? 'pill-pendiente' : 'pill-cancelada';
+    const pilltxt = r.estado === 'confirmada' ? '✅ Confirmada' : r.estado === 'pendiente' ? '⏳ Pendiente' : '❌ Cancelada';
+
+    return `
+    <div class="bg-white rounded-lg border border-stone-150 p-4 hover:shadow-md transition-shadow cursor-pointer"
+         onclick="abrirReserva('${r.id}')">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <div class="font-semibold text-pine-900 text-sm">${r.nombre}</div>
+          <div class="text-stone-500 text-xs mt-0.5">${r.telefono}${r.email ? ' · ' + r.email : ''}</div>
+        </div>
+        <span class="text-xs font-medium px-2 py-1 rounded-full ${pillCls} shrink-0">${pilltxt}</span>
+      </div>
+      <div class="flex flex-wrap gap-4 text-sm">
+        <div><span class="text-stone-500 text-xs">Entrada</span><div class="font-medium text-pine-900">${fmtEuropeo(r.entrada)}</div></div>
+        <div><span class="text-stone-500 text-xs">Salida</span><div class="font-medium text-pine-900">${fmtEuropeo(r.salida)}</div></div>
+        <div><span class="text-stone-500 text-xs">Noches</span><div class="font-medium text-pine-900">${noches}</div></div>
+        <div><span class="text-stone-500 text-xs">Personas</span><div class="font-medium text-pine-900">${r.personas}</div></div>
+        <div><span class="text-stone-500 text-xs">Total</span><div class="font-display font-semibold text-pine-900">${total.toLocaleString('es-ES')} €</div></div>
+        ${pendiente > 0 ? `<div><span class="text-stone-500 text-xs">Pendiente</span><div class="font-medium text-wood-600">${pendiente.toLocaleString('es-ES')} €</div></div>` : ''}
+      </div>
+      ${r.notas ? `<div class="mt-2 text-xs text-stone-500 italic">${r.notas}</div>` : ''}
+      <div class="mt-3 flex gap-2">
+        <a href="https://wa.me/34${r.telefono.replace(/\s/g,'')}" target="_blank" onclick="event.stopPropagation()"
+           class="flex items-center gap-1 text-xs text-stone-500 hover:text-pine-900 transition-colors">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.524 5.824L.057 23.852l6.196-1.624A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          WhatsApp
+        </a>
+        <a href="tel:${r.telefono}" onclick="event.stopPropagation()" class="text-xs text-stone-500 hover:text-pine-900 transition-colors">📞 Llamar</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportarCSV() {
+  const filas = [['ID','Estado','Entrada','Salida','Noches','Personas','Nombre','Teléfono','Email','Doc','Pago','Pagado (€)','Total (€)','Notas']];
+  D.reservas.forEach(r => {
+    filas.push([r.id, r.estado, r.entrada, r.salida, diasEntre(r.entrada, r.salida),
+      r.personas, r.nombre, r.telefono, r.email, `${r.docTipo}: ${r.docNum}`,
+      r.pagoMetodo, r.pagado || 0, precioReserva(r), r.notas]);
+  });
+  const csv = filas.map(f => f.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })),
+    download: `reservas-adp-${fmtFecha(new Date())}.csv`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PRECIOS
+// ═══════════════════════════════════════════════════════════════════
+
+const MESES_N = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function renderPrecios() {
+  const el = document.getElementById('lista-temporadas');
+  el.innerHTML = D.temporadas.map((t, i) => `
+    <div class="bg-white rounded-lg border border-stone-150 p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <input type="text" value="${t.nombre}" onchange="D.temporadas[${i}].nombre=this.value;guardar(D)"
+          class="flex-1 font-semibold text-pine-900 border-b border-transparent hover:border-stone-300 focus:border-wood-400 outline-none text-sm py-0.5 transition-colors">
+        <div class="flex items-center gap-1.5">
+          <input type="number" value="${t.precioNoche}" min="0" step="10"
+            onchange="D.temporadas[${i}].precioNoche=+this.value;guardar(D)"
+            class="w-20 text-right border border-stone-300 rounded px-2 py-1 text-sm font-semibold text-wood-600">
+          <span class="text-stone-500 text-sm">€/noche</span>
+        </div>
+        <button onclick="eliminarTemporada('${t.id}')" class="text-stone-400 hover:text-red-500 transition-colors text-lg">✕</button>
+      </div>
+      <div>
+        <p class="text-xs text-stone-500 mb-2">Meses incluidos en esta temporada:</p>
+        <div class="flex flex-wrap gap-1.5">
+          ${Array.from({length:12},(_,m) => {
+            const n = m+1;
+            const sel = t.meses.includes(n);
+            return `<button onclick="toggleMes('${t.id}',${n})"
+              class="px-2.5 py-1 rounded text-xs font-medium transition-colors ${sel ? 'bg-pine-900 text-wood-300' : 'bg-stone-150 text-stone-600 hover:bg-stone-300'}">
+              ${MESES_N[n]}</button>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleMes(tid, mes) {
+  const t = D.temporadas.find(t => t.id === tid);
+  if (!t) return;
+  if (t.meses.includes(mes)) t.meses = t.meses.filter(m => m !== mes);
+  else t.meses.push(mes);
+  guardar(D); renderPrecios();
+}
+
+function nuevaTemporada() {
+  D.temporadas.push({ id: uid(), nombre: 'Nueva temporada', precioNoche: 300, meses: [] });
+  guardar(D); renderPrecios();
+}
+
+function eliminarTemporada(tid) {
+  if (!confirm('¿Eliminar esta temporada?')) return;
+  D.temporadas = D.temporadas.filter(t => t.id !== tid);
+  guardar(D); renderPrecios();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FINANZAS
+// ═══════════════════════════════════════════════════════════════════
+
+function renderFinanzas() {
+  const hoy = new Date();
+
+  // KPIs (año actual)
+  const reservasConf = D.reservas.filter(r => r.estado === 'confirmada');
+  const ingTotales = reservasConf.reduce((a, r) => a + precioReserva(r), 0);
+  const gasTotales = D.gastos.reduce((a, g) => a + g.importe, 0);
+  const cobrado = reservasConf.reduce((a, r) => a + (r.pagado || 0), 0);
+  const pendCobro = ingTotales - cobrado;
+
+  document.getElementById('fin-kpis').innerHTML = `
+    <div class="bg-white rounded-lg border border-stone-150 p-4">
+      <div class="text-stone-500 text-xs mb-1">Ingresos confirmados</div>
+      <div class="font-display text-2xl font-semibold text-pine-900">${ingTotales.toLocaleString('es-ES')} €</div>
+    </div>
+    <div class="bg-white rounded-lg border border-stone-150 p-4">
+      <div class="text-stone-500 text-xs mb-1">Gastos registrados</div>
+      <div class="font-display text-2xl font-semibold text-pine-900">${gasTotales.toLocaleString('es-ES')} €</div>
+    </div>
+    <div class="bg-white rounded-lg border border-stone-150 p-4">
+      <div class="text-stone-500 text-xs mb-1">Beneficio neto</div>
+      <div class="font-display text-2xl font-semibold ${ingTotales - gasTotales >= 0 ? 'text-pine-700' : 'text-red-600'}">${(ingTotales - gasTotales).toLocaleString('es-ES')} €</div>
+    </div>
+    <div class="bg-white rounded-lg border border-stone-150 p-4">
+      <div class="text-stone-500 text-xs mb-1">Pendiente de cobro</div>
+      <div class="font-display text-2xl font-semibold text-wood-600">${pendCobro.toLocaleString('es-ES')} €</div>
+    </div>
+  `;
+
+  // Gráfico 6 meses
+  const meses6 = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const ing = D.reservas.filter(r => r.estado === 'confirmada' && r.entrada.startsWith(key))
+      .reduce((a, r) => a + precioReserva(r), 0);
+    const gas = D.gastos.filter(g => g.fecha.startsWith(key)).reduce((a, g) => a + g.importe, 0);
+    meses6.push({ label: MESES_N[d.getMonth()+1], ing, gas });
+  }
+
+  const maxVal = Math.max(...meses6.map(m => Math.max(m.ing, m.gas)), 1);
+  document.getElementById('grafico').innerHTML = meses6.map(m => `
+    <div class="flex items-center gap-3">
+      <div class="text-xs text-stone-500 w-8 shrink-0">${m.label}</div>
+      <div class="flex-1 flex flex-col gap-1">
+        <div class="flex items-center gap-2">
+          <div class="chart-bar-ing rounded h-4" style="width:${Math.max((m.ing/maxVal)*100,m.ing>0?2:0)}%"></div>
+          <span class="text-xs text-pine-900 font-medium">${m.ing ? m.ing.toLocaleString('es-ES') + ' €' : '—'}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="chart-bar-gas rounded h-4" style="width:${Math.max((m.gas/maxVal)*100,m.gas>0?2:0)}%"></div>
+          <span class="text-xs text-stone-600">${m.gas ? m.gas.toLocaleString('es-ES') + ' €' : '—'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Gastos
+  const el = document.getElementById('lista-gastos');
+  const gasOrdenados = [...D.gastos].sort((a,b) => b.fecha.localeCompare(a.fecha));
+  if (!gasOrdenados.length) {
+    el.innerHTML = '<p class="text-stone-500 text-sm text-center py-6">Sin gastos registrados.</p>';
+  } else {
+    el.innerHTML = gasOrdenados.map(g => `
+      <div class="flex items-center gap-3 py-2 border-b border-stone-100 last:border-0">
+        <div class="flex-1">
+          <div class="text-sm font-medium text-pine-900">${g.concepto}</div>
+          <div class="text-xs text-stone-500">${g.cat} · ${fmtEuropeo(g.fecha)}</div>
+        </div>
+        <div class="text-sm font-semibold text-stone-700">${g.importe.toLocaleString('es-ES')} €</div>
+        <button onclick="eliminarGasto('${g.id}')" class="text-stone-300 hover:text-red-500 transition-colors text-sm">✕</button>
+      </div>
+    `).join('');
+  }
+}
+
+function nuevoGasto() {
+  document.getElementById('g-concepto').value = '';
+  document.getElementById('g-importe').value = '';
+  document.getElementById('g-fecha').value = fmtFecha(new Date());
+  document.getElementById('g-cat').value = 'Limpieza';
+  document.getElementById('modal-gasto').classList.remove('hidden');
+}
+
+function cerrarGasto() {
+  document.getElementById('modal-gasto').classList.add('hidden');
+}
+
+function guardarGasto() {
+  const concepto = document.getElementById('g-concepto').value.trim();
+  const importe = parseFloat(document.getElementById('g-importe').value);
+  const fecha = document.getElementById('g-fecha').value;
+  if (!concepto || isNaN(importe) || !fecha) { alert('Rellena concepto, importe y fecha.'); return; }
+  D.gastos.push({ id: uid(), concepto, importe, fecha, cat: document.getElementById('g-cat').value });
+  guardar(D);
+  cerrarGasto();
+  renderFinanzas();
+}
+
+function eliminarGasto(id) {
+  if (!confirm('¿Eliminar este gasto?')) return;
+  D.gastos = D.gastos.filter(g => g.id !== id);
+  guardar(D); renderFinanzas();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MODAL RESERVA
+// ═══════════════════════════════════════════════════════════════════
+
+let editId = null;
+let estadoActual = 'pendiente';
+
+function nuevaReserva(fechaEntrada = null) {
+  editId = null;
+  estadoActual = 'pendiente';
+  limpiarModal();
+  if (fechaEntrada) {
+    document.getElementById('f-entrada').value = fechaEntrada;
+    // Sugerir salida 3 días después
+    const s = new Date(fechaEntrada);
+    s.setDate(s.getDate() + 3);
+    document.getElementById('f-salida').value = fmtFecha(s);
+  }
+  document.getElementById('modal-titulo').textContent = 'Nueva reserva';
+  document.getElementById('btn-eliminar').classList.add('hidden');
+  document.getElementById('ses-bloque').classList.add('hidden');
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  calcularPrecio();
+}
+
+function abrirReserva(id) {
+  const r = D.reservas.find(r => r.id === id);
+  if (!r) return;
+  editId = id;
+  estadoActual = r.estado;
+  limpiarModal();
+
+  // Llenar campos
+  document.getElementById('f-entrada').value = r.entrada;
+  document.getElementById('f-salida').value = r.salida;
+  document.getElementById('f-personas').value = r.personas;
+  document.getElementById('f-nombre').value = r.nombre;
+  document.getElementById('f-telefono').value = r.telefono;
+  document.getElementById('f-email').value = r.email || '';
+  document.getElementById('f-doc-tipo').value = r.docTipo || 'DNI';
+  document.getElementById('f-doc-num').value = r.docNum || '';
+  document.getElementById('f-nacimiento').value = r.nacimiento || '';
+  document.getElementById('f-nacion').value = r.nacion || 'Española';
+  document.getElementById('f-pago-metodo').value = r.pagoMetodo || 'Bizum';
+  document.getElementById('f-pago-fecha').value = r.pagoFecha || '';
+  document.getElementById('f-notas').value = r.notas || '';
+  document.getElementById('f-pagado').value = r.pagado || 0;
+
+  setEstado(r.estado, false);
+
+  // Viajeros
+  const sesBlq = document.getElementById('ses-bloque');
+  sesBlq.classList.remove('hidden');
+  renderViajeros(r.viajeros || []);
+
+  document.getElementById('modal-titulo').textContent = 'Editar reserva';
+  document.getElementById('btn-eliminar').classList.remove('hidden');
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  calcularPrecio();
+}
+
+function limpiarModal() {
+  ['f-entrada','f-salida','f-nombre','f-telefono','f-email','f-doc-num',
+   'f-nacimiento','f-pago-fecha','f-notas','f-pagado'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-personas').value = 2;
+  document.getElementById('f-nacion').value = 'Española';
+  document.getElementById('f-doc-tipo').value = 'DNI';
+  document.getElementById('f-pago-metodo').value = 'Bizum';
+  document.getElementById('doc-error').classList.add('hidden');
+  document.getElementById('lista-viajeros').innerHTML = '';
+  setEstado('pendiente', false);
+}
+
+function cerrarModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  editId = null;
+}
+
+function setEstado(estado, save = true) {
+  estadoActual = estado;
+  ['pendiente','confirmada','cancelada'].forEach(e => {
+    const btn = document.getElementById('btn-' + e);
+    if (!btn) return;
+    const activo = e === estado;
+    const colores = {
+      pendiente:  { act: 'border-wood-500 bg-wood-100 text-wood-700',   inact: 'border-stone-200 bg-stone-100 text-stone-500' },
+      confirmada: { act: 'border-pine-700 bg-pine-100 text-pine-800',   inact: 'border-stone-200 bg-stone-100 text-stone-500' },
+      cancelada:  { act: 'border-stone-500 bg-stone-200 text-stone-700', inact: 'border-stone-200 bg-stone-100 text-stone-500' },
+    };
+    btn.className = `flex-1 py-2 rounded text-sm font-medium border-2 ${activo ? colores[e].act : colores[e].inact}`;
+  });
+}
+
+function validarDoc() {
+  const tipo = document.getElementById('f-doc-tipo').value;
+  const num = document.getElementById('f-doc-num').value.trim().toUpperCase();
+  const err = document.getElementById('doc-error');
+  if (!num) { err.classList.add('hidden'); return; }
+  const ok = tipo === 'DNI' ? validarDNI(num) : tipo === 'NIE' ? validarNIE(num) : validarPasaporte(num);
+  err.textContent = ok ? '' : `${tipo} no válido`;
+  err.classList.toggle('hidden', ok);
+}
+
+function calcularPrecio() {
+  const e = document.getElementById('f-entrada').value;
+  const s = document.getElementById('f-salida').value;
+  if (!e || !s || s <= e) { document.getElementById('precio-calc').classList.add('hidden'); return; }
+
+  const noches = diasEntre(e, s);
+  const mesEntrada = new Date(e).getMonth() + 1;
+  const t = D.temporadas.find(t => t.meses.includes(mesEntrada));
+  const pNoche = t ? t.precioNoche : (D.temporadas[0] ? D.temporadas[0].precioNoche : 300);
+  const total = noches * pNoche;
+
+  document.getElementById('precio-num').textContent = `${total.toLocaleString('es-ES')} €`;
+  document.getElementById('precio-det').textContent = `${noches} noches × ${pNoche} €/noche${t ? ' (' + t.nombre + ')' : ''}`;
+  document.getElementById('precio-calc').classList.remove('hidden');
+}
+
+function guardarReserva() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const telefono = document.getElementById('f-telefono').value.trim();
+  const entrada = document.getElementById('f-entrada').value;
+  const salida = document.getElementById('f-salida').value;
+
+  if (!nombre) { alert('El nombre del huésped es obligatorio.'); return; }
+  if (!telefono) { alert('El teléfono es obligatorio.'); return; }
+  if (!entrada || !salida) { alert('Las fechas de entrada y salida son obligatorias.'); return; }
+  if (salida <= entrada) { alert('La salida debe ser posterior a la entrada.'); return; }
+
+  const reserva = {
+    id: editId || uid(),
+    estado: estadoActual,
+    entrada, salida,
+    personas: parseInt(document.getElementById('f-personas').value) || 2,
+    nombre,
+    telefono,
+    email: document.getElementById('f-email').value.trim(),
+    docTipo: document.getElementById('f-doc-tipo').value,
+    docNum: document.getElementById('f-doc-num').value.trim().toUpperCase(),
+    nacimiento: document.getElementById('f-nacimiento').value,
+    nacion: document.getElementById('f-nacion').value.trim(),
+    pagoMetodo: document.getElementById('f-pago-metodo').value,
+    pagoFecha: document.getElementById('f-pago-fecha').value,
+    pagado: parseFloat(document.getElementById('f-pagado').value) || 0,
+    notas: document.getElementById('f-notas').value.trim(),
+    viajeros: editId ? (D.reservas.find(r => r.id === editId)?.viajeros || []) : [],
+    creada: editId ? (D.reservas.find(r => r.id === editId)?.creada || new Date().toISOString()) : new Date().toISOString(),
+  };
+
+  if (editId) {
+    D.reservas = D.reservas.map(r => r.id === editId ? reserva : r);
+  } else {
+    D.reservas.push(reserva);
+  }
+  guardar(D);
+  cerrarModal();
+  if (tabActual === 'calendario') renderCalendario();
+  if (tabActual === 'reservas') renderReservas();
+}
+
+function eliminarReserva() {
+  if (!editId || !confirm('¿Eliminar esta reserva definitivamente?')) return;
+  D.reservas = D.reservas.filter(r => r.id !== editId);
+  guardar(D);
+  cerrarModal();
+  if (tabActual === 'calendario') renderCalendario();
+  if (tabActual === 'reservas') renderReservas();
+}
+
+// Viajeros SES
+function renderViajeros(viajeros) {
+  document.getElementById('lista-viajeros').innerHTML = viajeros.map((v, i) => `
+    <div class="bg-stone-50 rounded p-3 border border-stone-200 text-xs space-y-1">
+      <div class="flex items-center justify-between">
+        <span class="font-medium text-pine-900">${v.nombre || 'Viajero ' + (i+1)}</span>
+        <button onclick="removeViajero(${i})" class="text-stone-400 hover:text-red-500">✕</button>
+      </div>
+      <div class="text-stone-500">${v.docTipo} ${v.docNum} · ${v.nacimiento || '—'} · ${v.nacion}</div>
+    </div>
+  `).join('') || '<p class="text-stone-400 text-xs">Sin viajeros añadidos.</p>';
+}
+
+function addViajero() {
+  const nom = prompt('Nombre completo del viajero:');
+  if (!nom) return;
+  const r = D.reservas.find(r => r.id === editId);
+  if (!r) return;
+  r.viajeros = r.viajeros || [];
+  r.viajeros.push({ nombre: nom, docTipo: 'DNI', docNum: '', nacimiento: '', nacion: 'Española' });
+  guardar(D);
+  renderViajeros(r.viajeros);
+}
+
+function removeViajero(i) {
+  const r = D.reservas.find(r => r.id === editId);
+  if (!r) return;
+  r.viajeros.splice(i, 1);
+  guardar(D);
+  renderViajeros(r.viajeros);
+}
+
+// Cerrar modal al click fuera
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  INICIO
+// ═══════════════════════════════════════════════════════════════════
+
+// Leer hash de URL
+const hash = location.hash.replace('#', '') || 'calendario';
+irA(['calendario','reservas','precios','finanzas'].includes(hash) ? hash : 'calendario');
+</script>
+</body>
+</html>
