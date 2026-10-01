@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aire de Pinares — Vivienda de Uso Turístico en Coca, Segovia</title>
+  <meta name="description" content="Casa rural para grupos en Coca (Segovia). 5 dormitorios, hasta 10 personas, alquiler íntegro. WiFi, 2 cocinas, chimenea, jardín y barbacoa. A 135 km de Madrid.">
+  <link rel="canonical" href="https://begogranada.github.io/aire-de-pinares/">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Cormorant Garamond', 'Georgia', 'serif'],
+            body:    ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            pine: {
+              50:  '#f0f5f0',
+              100: '#d6e8d6',
+              200: '#aed0ae',
+              300: '#7fb57f',
+              500: '#3a6033',
+              700: '#2b4824',
+              800: '#1e3019',
+              900: '#1a261b',
+              950: '#0d1510',
+            },
+            wood: {
+              100: '#f5e6d3',
+              300: '#d4a878',
+              500: '#b07a45',
+              600: '#8f5f30',
+              700: '#6e4420',
+            },
+            cream: '#faf6ef',
+            stone: {
+              150: '#ece7df',
+              300: '#d4cdc5',
+              600: '#7a726a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Base */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #faf6ef; color: #1a261b; }
+
+    /* Typography */
+    .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+    /* Hero video */
+    .hero-bg {
+      position: absolute; inset: 0; overflow: hidden;
+      background: #0d1510 url('img/fachada-piscina.jpg') center/cover no-repeat;
+    }
+    .hero-bg iframe {
+      position: absolute; top: 50%; left: 50%;
+      width: 177.78vh; height: 100vh;
+      min-width: 100%; min-height: 56.25vw;
+      transform: translate(-50%, -50%);
+      pointer-events: none; border: none;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(10,18,10,0.55) 0%,
+        rgba(10,18,10,0.38) 45%,
+        rgba(10,18,10,0.72) 100%);
+    }
+
+    /* Nav */
+    #main-nav { transition: background 0.35s, box-shadow 0.35s; }
+    #main-nav.scrolled { background: rgba(26,38,27,0.97); box-shadow: 0 2px 16px rgba(0,0,0,0.35); }
+
+    /* Reveal animations */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* Cards */
+    .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,38,27,0.18); }
+
+    /* Separador decorativo */
+    .divider { width: 48px; height: 2px; background: #b07a45; margin: 0 auto 1.5rem; }
+
+    /* Photo gallery grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 220px);
+      grid-auto-rows: 220px;
+      gap: 8px;
+    }
+    .gallery-grid img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-grid .span-2 { grid-column: span 2; }
+
+    /* Mobile nav */
+    #mobile-menu { transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 0; opacity: 0; overflow: hidden; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* Propietarios section photo */
+    .owner-photo {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #b07a45;
+    }
+
+    @media (max-width: 640px) {
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gallery-grid .span-2 { grid-column: span 2; }
+    }
+  </style>
+</head>
+<body class="bg-cream text-pine-900">
+
+<!-- ═══════════════════════════════════════════ NAV ══ -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 bg-transparent">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <!-- Logo -->
+      <a href="#inicio" class="flex items-center">
+        <img src="img/logo.png" alt="Aire de Pinares" class="h-11 w-auto" style="filter: brightness(0) invert(1);">
+      </a>
+
+      <!-- Desktop nav -->
+      <div class="hidden lg:flex items-center gap-8">
+        <a href="#la-casa" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">La Casa</a>
+        <a href="#jardín" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">El Jardín</a>
+        <a href="#habitaciones" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">Las Habitaciones</a>
+        <a href="#entorno" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">El Entorno</a>
+        <a href="#propietarios" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">Propietarios</a>
+        <a href="#reservas" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">Reservas</a>
+        <a href="#contacto" class="text-stone-300 hover:text-white text-sm font-medium transition-colors">Contacto</a>
+        <a href="gestor.html" class="flex items-center gap-1.5 text-stone-300 hover:text-white text-sm font-medium transition-colors">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
+          Propietarios
+        </a>
+        <a href="#reservas"
+           class="bg-wood-500 hover:bg-wood-600 text-white text-sm font-semibold px-5 py-2.5 rounded-sm transition-colors">
+          Reservar
+        </a>
+      </div>
+
+      <!-- Mobile toggle -->
+      <button id="menu-btn" aria-label="Menú" class="lg:hidden text-white p-2">
+        <svg id="icon-open" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="icon-close" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="hidden">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="lg:hidden bg-pine-900/95 backdrop-blur">
+      <div class="px-4 py-4 flex flex-col gap-3">
+        <a href="#la-casa" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">La Casa</a>
+        <a href="#jardín" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">El Jardín</a>
+        <a href="#habitaciones" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">Las Habitaciones</a>
+        <a href="#entorno" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">El Entorno</a>
+        <a href="#propietarios" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">Propietarios</a>
+        <a href="#reservas" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">Reservas</a>
+        <a href="#contacto" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">Contacto</a>
+        <a href="gestor.html" class="mobile-link text-stone-300 hover:text-white text-sm py-2 border-b border-pine-800 transition-colors">Área propietarios</a>
+        <a href="#reservas"
+           class="bg-wood-500 text-white text-sm font-semibold px-4 py-3 rounded text-center mt-1">
+          Reservar
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ HERO ══ -->
+<section id="inicio" class="relative flex min-h-svh items-end pb-16 lg:pb-24">
+
+  <!-- Background: foto de fallback + iframe YT (comentado hasta tener URL) -->
+  <div class="hero-bg">
+    <!-- Para activar vídeo YouTube, descomentar la línea siguiente y poner el ID del vídeo: -->
+    <!-- <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0&showinfo=0&rel=0&iv_load_policy=3" allowfullscreen></iframe> -->
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-5 lg:px-10 w-full">
+    <div class="max-w-3xl">
+      <p class="text-wood-300 text-sm font-medium tracking-[0.2em] uppercase mb-4">Coca · Segovia</p>
+      <h1 class="font-display text-5xl lg:text-7xl text-white font-semibold leading-[1.08] mb-6">
+        Respira el pinar.<br>
+        <em class="text-wood-300 font-normal">Siente Castilla.</em>
+      </h1>
+      <p class="text-stone-300 text-lg lg:text-xl leading-relaxed mb-10 max-w-xl">
+        Vivienda de uso turístico para grupos en el corazón de la Tierra de Pinares.
+        5&nbsp;dormitorios, hasta 10&nbsp;personas, alquiler íntegro.
+      </p>
+
+      <!-- Stats -->
+      <div class="flex flex-wrap gap-6 mb-10">
+        <div class="text-center">
+          <div class="font-display text-3xl text-wood-300 font-semibold">5</div>
+          <div class="text-stone-300 text-xs tracking-wider uppercase">Dormitorios</div>
+        </div>
+        <div class="w-px bg-pine-700 self-stretch"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl text-wood-300 font-semibold">10</div>
+          <div class="text-stone-300 text-xs tracking-wider uppercase">Personas</div>
+        </div>
+        <div class="w-px bg-pine-700 self-stretch"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl text-wood-300 font-semibold">2</div>
+          <div class="text-stone-300 text-xs tracking-wider uppercase">Cocinas</div>
+        </div>
+        <div class="w-px bg-pine-700 self-stretch"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl text-wood-300 font-semibold">135</div>
+          <div class="text-stone-300 text-xs tracking-wider uppercase">km de Madrid</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a href="https://wa.me/34646611028?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20en%20Aire%20de%20Pinares"
+           target="_blank"
+           class="inline-flex items-center gap-2 bg-wood-500 hover:bg-wood-600 text-white font-semibold px-7 py-3.5 rounded-sm transition-colors">
+          <!-- WhatsApp icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.524 5.824L.057 23.852l6.196-1.624A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.893a9.849 9.849 0 01-5.032-1.374l-.361-.214-3.741.981.998-3.648-.235-.374A9.868 9.868 0 012.107 12C2.107 6.577 6.577 2.107 12 2.107S21.893 6.577 21.893 12 17.423 21.893 12 21.893z"/></svg>
+          Reservar por WhatsApp
+        </a>
+        <a href="#la-casa"
+           class="inline-flex items-center gap-2 border border-white/40 text-white hover:border-white hover:bg-white/10 font-medium px-7 py-3.5 rounded-sm transition-colors">
+          Descubrir la casa
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/50 z-10">
+    <div class="w-px h-10 bg-gradient-to-b from-transparent to-white/40"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ LA CASA ══ -->
+<section id="la-casa" class="py-20 lg:py-32 bg-cream">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="lg:grid lg:grid-cols-2 lg:gap-20 lg:items-center">
+
+      <!-- Texto -->
+      <div class="reveal-left mb-12 lg:mb-0">
+        <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Alojamiento completo</p>
+        <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold leading-tight mb-6">
+          Una casa entera<br>solo para vosotros
+        </h2>
+        <div class="divider !mx-0 mb-6"></div>
+        <p class="text-stone-600 leading-relaxed mb-5">
+          Aire de Pinares es una vivienda de uso turístico situada en Coca, Segovia, en plena
+          Tierra de Pinares. Se alquila de forma íntegra, por lo que todo el espacio es para
+          vuestro grupo: sin compartir, sin vecinos de puerta.
+        </p>
+        <p class="text-stone-600 leading-relaxed mb-8">
+          Con 5 dormitorios y capacidad para 10 adultos, dos cocinas completamente equipadas,
+          chimenea de leña, garaje cubierto y un amplio jardín con barbacoa, la casa está
+          pensada para desconectar de verdad.
+        </p>
+
+        <!-- Features grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🌐</span>
+            <span class="text-sm text-pine-900 font-medium">WiFi en toda la casa</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🍳</span>
+            <span class="text-sm text-pine-900 font-medium">2 cocinas equipadas</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🔥</span>
+            <span class="text-sm text-pine-900 font-medium">Chimenea de leña</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🚗</span>
+            <span class="text-sm text-pine-900 font-medium">Garaje cubierto</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🍖</span>
+            <span class="text-sm text-pine-900 font-medium">Barbacoa</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🪵</span>
+            <span class="text-sm text-pine-900 font-medium">Lumbre exterior</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">🛝</span>
+            <span class="text-sm text-pine-900 font-medium">Parque infantil</span>
+          </div>
+          <div class="flex items-center gap-2.5 bg-stone-150 rounded px-3 py-2.5">
+            <span class="text-wood-500">📺</span>
+            <span class="text-sm text-pine-900 font-medium">Smart TV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Foto -->
+      <div class="reveal-right">
+        <div class="relative">
+          <img src="img/exterior-jardin.jpg"
+               alt="Exterior de Aire de Pinares"
+               class="w-full aspect-[4/3] object-cover rounded-sm shadow-2xl">
+          <!-- Tarjeta flotante -->
+          <div class="absolute -bottom-5 -left-5 bg-pine-900 text-white px-5 py-4 rounded shadow-xl hidden lg:block">
+            <div class="font-display text-3xl font-semibold text-wood-300">10 <span class="text-xl">pers.</span></div>
+            <div class="text-stone-300 text-xs tracking-wider">capacidad máxima</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ GALERÍA ══ -->
+<section id="jardín" class="py-20 lg:py-28 bg-pine-900">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-300 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Jardín y exterior</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-white font-semibold">El corazón de la casa</h2>
+      <div class="divider mt-5"></div>
+    </div>
+
+    <div class="gallery-grid reveal">
+      <img class="span-2" src="img/escaleras-flores.jpg" alt="Escaleras y jardín en flor" loading="lazy">
+      <img src="img/exterior-jardin.jpg" alt="Jardín con palmera" loading="lazy">
+      <img src="img/terraza-lounge.jpg" alt="Terraza cubierta con sofás" loading="lazy">
+      <img src="img/piscina-barrica.jpg" alt="Piscina y rincón de bar" loading="lazy">
+      <img src="img/barbacoa.jpg" alt="Barbacoa de ladrillo" loading="lazy">
+      <img src="img/fachada-calle.jpg" alt="Fachada desde la calle" loading="lazy">
+    </div>
+
+    <p class="text-center text-stone-300 text-sm mt-6 reveal">
+      Jardín privado, barbacoa, lumbre de exterior y parque infantil — el espacio donde sucede la vida.
+    </p>
+
+    <!-- Galería nocturna -->
+    <div class="text-center reveal mt-20 mb-10">
+      <p class="text-wood-300 text-xs font-semibold tracking-[0.2em] uppercase mb-3">La magia de la noche</p>
+      <h3 class="font-display text-3xl lg:text-4xl text-white font-semibold">Cuando cae el sol</h3>
+    </div>
+
+    <div class="gallery-grid reveal">
+      <img class="span-2" src="img/fachada-noche-azul.jpg" alt="Fachada iluminada al anochecer" loading="lazy">
+      <img src="img/piscina-noche-reflejo.jpg" alt="Piscina con reflejos nocturnos" loading="lazy">
+      <img src="img/terraza-noche-sofa.jpg" alt="Terraza iluminada por la noche" loading="lazy">
+      <img src="img/gazebo-noche-lluvia.jpg" alt="Gazebo con iluminación nocturna" loading="lazy">
+      <img src="img/entrada-noche-caballero.jpg" alt="Entrada iluminada al anochecer" loading="lazy">
+    </div>
+
+    <p class="text-center text-stone-300 text-sm mt-6 mb-2 reveal">
+      La casa cobra otra personalidad cuando cae la noche — piscina iluminada, gazebo, terraza... todo vuestro.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ HABITACIONES ══ -->
+<section id="habitaciones" class="py-20 lg:py-28 bg-cream">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Donde descansar</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold">Las habitaciones</h2>
+      <div class="divider mt-5"></div>
+      <p class="text-stone-600 max-w-xl mx-auto mt-4 text-base leading-relaxed">
+        5 dormitorios para hasta 10 personas — 3 habitaciones con cama de matrimonio y 2 con camas individuales. Cada una con su personalidad propia.
+      </p>
+    </div>
+
+    <!-- Dormitorios de matrimonio -->
+    <p class="text-pine-900 font-semibold text-xs uppercase tracking-widest mb-5">Habitaciones dobles</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150">
+        <div class="h-52 overflow-hidden">
+          <img src="img/dormitorio-matrimonio-rosa.jpg" alt="Habitación doble con tonos rosas" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Habitación rosa</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">Cama de matrimonio · Ambiente cálido y luminoso</p>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.1s">
+        <div class="h-52 overflow-hidden">
+          <img src="img/dormitorio-matrimonio-turquesa.jpg" alt="Habitación doble en tonos turquesa" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Habitación turquesa</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">Cama de matrimonio · Tonos frescos y naturales</p>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.2s">
+        <div class="h-52 overflow-hidden">
+          <img src="img/dormitorio-matrimonio-lampara.jpg" alt="Habitación doble con lámpara artesanal" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Habitación de la lámpara</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">Cama de matrimonio · Detalles artesanales únicos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Habitaciones twin -->
+    <p class="text-pine-900 font-semibold text-xs uppercase tracking-widest mb-5">Habitaciones twin (dos camas)</p>
+    <div class="grid sm:grid-cols-2 gap-4 mb-12">
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150">
+        <div class="h-52 overflow-hidden">
+          <img src="img/dormitorio-dos-camas-verde.jpg" alt="Habitación con dos camas en tonos verdes" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Habitación verde</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">2 camas individuales · Ideal para niños o amigos</p>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.1s">
+        <div class="h-52 overflow-hidden">
+          <img src="img/dormitorio-dos-camas-morado.jpg" alt="Habitación con dos camas en tonos morados" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Habitación morada</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">2 camas individuales · Mucho carácter y color</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Espacios comunes -->
+    <p class="text-pine-900 font-semibold text-xs uppercase tracking-widest mb-5">Espacios comunes</p>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150">
+        <div class="h-52 overflow-hidden">
+          <img src="img/salon-sofa-mueble.jpg" alt="Salón con sofá" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Salón</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">Smart TV, sofá amplio y espacio para reunir al grupo</p>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.1s">
+        <div class="h-52 overflow-hidden">
+          <img src="img/bodega-salon.jpg" alt="Bodega con chimenea y barra" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Bodega</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">El rincón estrella — chimenea, barra y ambiente propio</p>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.2s">
+        <div class="h-52 overflow-hidden">
+          <img src="img/cocina.jpg" alt="Cocina completamente equipada" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-4">
+          <h4 class="font-display text-xl text-pine-900 font-semibold">Cocina</h4>
+          <p class="text-stone-600 text-sm mt-1 leading-relaxed">Completamente equipada · La casa cuenta con 2 cocinas</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ EVENTOS ══ -->
+<section class="py-20 lg:py-28 bg-cream">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Momentos para celebrar</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold">Cada temporada,<br>un plan distinto</h2>
+      <div class="divider mt-5"></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Cumpleaños -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150">
+        <div class="h-48 overflow-hidden">
+          <img src="img/evento-cumpleanos-bodega.jpg" alt="Fiesta de cumpleaños en la bodega" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Cumpleaños</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">
+            Reúne a los tuyos y celebra como mereces. La casa entera es vuestra — cocina, jardín, piscina de verano.
+          </p>
+        </div>
+      </div>
+      <!-- Halloween -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.1s">
+        <div class="h-48 overflow-hidden">
+          <img src="img/canva-fiesta-halloween.jpg" alt="Fiesta de Halloween" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Halloween</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">
+            La noche de miedo perfecta, con lumbre en el jardín y el pinar como escenario. Para valientes.
+          </p>
+        </div>
+      </div>
+      <!-- Navidad -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.2s">
+        <div class="h-48 overflow-hidden">
+          <img src="img/evento-cumpleanos-chimenea.jpg" alt="Bodega con chimenea encendida" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Navidad</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">
+            Chimenea encendida, mesa grande y nieve posible. La Navidad de pueblo que siempre quisiste.
+          </p>
+        </div>
+      </div>
+      <!-- Carnaval -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150" style="transition-delay:0.3s">
+        <div class="h-48 overflow-hidden">
+          <img src="img/evento-cumpleanos-vista-general.jpg" alt="Celebración en la bodega" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Carnaval</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">
+            El famoso Carnaval de Coca, a pasos de la casa. Disfraces, música y una fiesta que no para.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ PROPIETARIOS ══ -->
+<section id="propietarios" class="py-20 lg:py-32 bg-stone-150">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Quiénes somos</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold">Los propietarios</h2>
+      <div class="divider mt-5"></div>
+    </div>
+
+    <div class="lg:grid lg:grid-cols-2 lg:gap-20 lg:items-center max-w-5xl mx-auto">
+
+      <!-- Fotos -->
+      <div class="reveal-left flex flex-col sm:flex-row lg:flex-col gap-6 items-center mb-12 lg:mb-0">
+        <div class="text-center">
+          <img src="img/entrada-porche.jpg"
+               alt="Entrada de Aire de Pinares"
+               class="owner-photo mx-auto mb-3">
+          <p class="font-display text-lg text-pine-900 font-semibold">Los anfitriones</p>
+          <p class="text-wood-500 text-sm">Coca, Segovia</p>
+        </div>
+
+        <!-- Datos de contacto rápido -->
+        <div class="flex flex-col gap-3 w-full sm:w-auto lg:w-full">
+          <a href="tel:+34646611028"
+             class="flex items-center gap-3 bg-white rounded px-4 py-3 card-hover shadow-sm border border-stone-150">
+            <span class="text-wood-500 text-xl">📞</span>
+            <div>
+              <div class="text-pine-900 font-semibold text-sm">646 61 10 28</div>
+              <div class="text-stone-600 text-xs">Llamar o WhatsApp</div>
+            </div>
+          </a>
+          <a href="tel:+34669048873"
+             class="flex items-center gap-3 bg-white rounded px-4 py-3 card-hover shadow-sm border border-stone-150">
+            <span class="text-wood-500 text-xl">📞</span>
+            <div>
+              <div class="text-pine-900 font-semibold text-sm">669 04 88 73</div>
+              <div class="text-stone-600 text-xs">Llamar o WhatsApp</div>
+            </div>
+          </a>
+          <a href="mailto:airedepinares@hotmail.com"
+             class="flex items-center gap-3 bg-white rounded px-4 py-3 card-hover shadow-sm border border-stone-150">
+            <span class="text-wood-500 text-xl">✉️</span>
+            <div>
+              <div class="text-pine-900 font-semibold text-sm">airedepinares@hotmail.com</div>
+              <div class="text-stone-600 text-xs">Correo electrónico</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Texto -->
+      <div class="reveal-right">
+        <h3 class="font-display text-3xl lg:text-4xl text-pine-900 font-semibold italic mb-2">
+          "Esta casa es un pedazo de nosotros."
+        </h3>
+        <div class="divider !mx-0 mb-6"></div>
+        <p class="text-stone-600 leading-relaxed mb-5">
+          Somos una familia que lleva años enamorada de Coca y de la Tierra de Pinares. Esta
+          vivienda es nuestra casa familiar, y cuando decidimos compartirla con otros viajeros,
+          quisimos mantener todo lo que la hace especial: el calor, los rincones con historia,
+          el jardín en el que hemos vivido tantos momentos.
+        </p>
+        <p class="text-stone-600 leading-relaxed mb-5">
+          Nos encanta recibir a grupos que buscan lo mismo que nosotros buscamos cuando viajamos:
+          espacio de verdad, comodidades sin renuncias, y la tranquilidad de un entorno que te
+          recibe con los brazos abiertos.
+        </p>
+        <p class="text-stone-600 leading-relaxed mb-8">
+          Estamos disponibles en todo momento para ayudaros a planificar vuestra estancia.
+          Cualquier duda, cualquier necesidad — nos encontráis al teléfono o por WhatsApp.
+        </p>
+
+        <!-- Compromiso -->
+        <div class="grid grid-cols-3 gap-4 pt-6 border-t border-stone-300">
+          <div class="text-center">
+            <div class="font-display text-3xl text-wood-500 font-semibold">100%</div>
+            <div class="text-pine-900 text-xs font-medium mt-1">Alquiler íntegro</div>
+          </div>
+          <div class="text-center">
+            <div class="font-display text-3xl text-wood-500 font-semibold">24h</div>
+            <div class="text-pine-900 text-xs font-medium mt-1">Disponibles</div>
+          </div>
+          <div class="text-center">
+            <div class="font-display text-3xl text-wood-500 font-semibold">❤️</div>
+            <div class="text-pine-900 text-xs font-medium mt-1">Con cariño</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ COCA ══ -->
+<section class="py-20 lg:py-28 bg-pine-900 relative overflow-hidden">
+  <div class="absolute inset-0 opacity-20">
+    <img src="img/castillo-de-coca.jpg"
+         alt="Castillo de Coca, Segovia"
+         class="w-full h-full object-cover">
+  </div>
+  <div class="absolute inset-0 bg-gradient-to-r from-pine-900/95 via-pine-900/80 to-pine-900/40"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-5 lg:px-10">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+
+      <div class="reveal mb-12 lg:mb-0">
+        <p class="text-wood-300 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Dónde estamos</p>
+        <h2 class="font-display text-4xl lg:text-5xl text-white font-semibold leading-tight mb-5">
+          Coca, en el corazón<br>de Castilla
+        </h2>
+        <div class="divider !mx-0 mb-6"></div>
+        <p class="text-stone-300 leading-relaxed mb-8">
+          A tan solo dos horas de Madrid y en el centro de la Castilla profunda, Coca es una
+          villa medieval que guarda siglos de historia. Su famoso castillo tardogótico, las
+          pinadas que rodean el pueblo y la tranquilidad de la meseta hacen de este rincón
+          un destino único.
+        </p>
+
+        <!-- Distancias -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex items-center gap-3 bg-pine-800/60 rounded px-4 py-3">
+            <span class="font-display text-2xl text-wood-300 font-semibold">135</span>
+            <div><div class="text-white text-sm font-medium">km Madrid</div><div class="text-stone-300 text-xs">~1h 45min</div></div>
+          </div>
+          <div class="flex items-center gap-3 bg-pine-800/60 rounded px-4 py-3">
+            <span class="font-display text-2xl text-wood-300 font-semibold">50</span>
+            <div><div class="text-white text-sm font-medium">km Segovia</div><div class="text-stone-300 text-xs">~40min</div></div>
+          </div>
+          <div class="flex items-center gap-3 bg-pine-800/60 rounded px-4 py-3">
+            <span class="font-display text-2xl text-wood-300 font-semibold">60</span>
+            <div><div class="text-white text-sm font-medium">km Valladolid</div><div class="text-stone-300 text-xs">~45min</div></div>
+          </div>
+          <div class="flex items-center gap-3 bg-pine-800/60 rounded px-4 py-3">
+            <span class="font-display text-2xl text-wood-300 font-semibold">60</span>
+            <div><div class="text-white text-sm font-medium">km Ávila</div><div class="text-stone-300 text-xs">~50min</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monumentos -->
+      <div class="reveal" style="transition-delay:0.2s">
+        <p class="text-wood-300 text-xs font-semibold tracking-[0.2em] uppercase mb-5">Qué ver en Coca</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 bg-pine-800/50 rounded px-4 py-3">
+            <span class="text-xl mt-0.5">🏰</span>
+            <div><div class="text-white font-medium text-sm">Castillo de Coca</div><div class="text-stone-300 text-xs">Joya del gótico-mudéjar, siglo XV</div></div>
+          </div>
+          <div class="flex items-start gap-3 bg-pine-800/50 rounded px-4 py-3">
+            <span class="text-xl mt-0.5">⛪</span>
+            <div><div class="text-white font-medium text-sm">Iglesia de Santa María la Mayor</div><div class="text-stone-300 text-xs">Arte mudéjar del siglo XIII</div></div>
+          </div>
+          <div class="flex items-start gap-3 bg-pine-800/50 rounded px-4 py-3">
+            <span class="text-xl mt-0.5">🌲</span>
+            <div><div class="text-white font-medium text-sm">Pinar de Coca</div><div class="text-stone-300 text-xs">1.000 ha de pino silvestre y resinero</div></div>
+          </div>
+          <div class="flex items-start gap-3 bg-pine-800/50 rounded px-4 py-3">
+            <span class="text-xl mt-0.5">🏛️</span>
+            <div><div class="text-white font-medium text-sm">Muralla romana</div><div class="text-stone-300 text-xs">Restos de la antigua Cauca romana</div></div>
+          </div>
+          <div class="flex items-start gap-3 bg-pine-800/50 rounded px-4 py-3">
+            <span class="text-xl mt-0.5">🎭</span>
+            <div><div class="text-white font-medium text-sm">Carnaval de Coca</div><div class="text-stone-300 text-xs">Fiesta de Interés Turístico de Castilla y León</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ENTORNO ══ -->
+<section id="entorno" class="py-20 lg:py-28 bg-cream">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">La región</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold">El entorno</h2>
+      <div class="divider mt-5"></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Segovia — foto real del collage de la región -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group">
+        <div class="h-44 relative overflow-hidden">
+          <img src="img/entorno-segovia-avila.jpg" alt="Acueducto y Alcázar de Segovia" class="w-full h-full object-cover object-top" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/50 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Segovia</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Acueducto romano, Alcázar y catedral a 50 km. Patrimonio de la Humanidad al alcance de la mano.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">50 km · ~40 min</div>
+        </div>
+      </div>
+
+      <!-- Ávila — card estilizada con gradiente -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group" style="transition-delay:0.1s">
+        <div class="h-44 relative overflow-hidden bg-pine-800">
+          <div class="absolute inset-0" style="background: linear-gradient(135deg, #1e3019 0%, #2b4824 50%, #3a6033 100%);"></div>
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <span class="text-4xl" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4))">⛪</span>
+            <div class="text-wood-300 text-xs font-semibold tracking-[0.15em] uppercase">Ciudad amurallada</div>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/40 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Ávila</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Muralla medieval intacta, catedral y la mística de Santa Teresa. Ciudad amurallada única en el mundo.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">60 km · ~50 min</div>
+        </div>
+      </div>
+
+      <!-- Castillos — foto del Castillo de Coca -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group" style="transition-delay:0.2s">
+        <div class="h-44 relative overflow-hidden">
+          <img src="img/castillo-de-coca.jpg" alt="Castillo de Coca, joya mudéjar" class="w-full h-full object-cover" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/50 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Castillos de la región</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Turégano, Cuéllar, Pedraza, Coca — la ruta de los castillos de Segovia a tu alrededor.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">20–60 km</div>
+        </div>
+      </div>
+
+      <!-- Hoces del Duratón — card estilizada -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group" style="transition-delay:0.1s">
+        <div class="h-44 relative overflow-hidden bg-pine-800">
+          <div class="absolute inset-0" style="background: linear-gradient(160deg, #0d1510 0%, #1e3019 40%, #2b4824 100%);"></div>
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <span class="text-4xl" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4))">🦅</span>
+            <div class="text-wood-300 text-xs font-semibold tracking-[0.15em] uppercase">Parque Natural</div>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/40 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Hoces del Duratón</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Parque natural con buitres leonados, canoas y vistas espectaculares. Una excursión memorable.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">70 km · ~55 min</div>
+        </div>
+      </div>
+
+      <!-- Pedraza — card estilizada -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group" style="transition-delay:0.2s">
+        <div class="h-44 relative overflow-hidden bg-pine-800">
+          <div class="absolute inset-0" style="background: linear-gradient(160deg, #1e3019 0%, #2b4824 60%, #1a261b 100%);"></div>
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <span class="text-4xl" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4))">🏘️</span>
+            <div class="text-wood-300 text-xs font-semibold tracking-[0.15em] uppercase">Pueblo más bonito</div>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/40 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Pedraza</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Uno de los pueblos más bonitos de España. Calles empedradas, mesón y el famoso Concierto de las Velas.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">55 km · ~45 min</div>
+        </div>
+      </div>
+
+      <!-- Tierra de Pinares — foto del jardín con pinos -->
+      <div class="reveal card-hover bg-white rounded-sm overflow-hidden shadow-sm border border-stone-150 group" style="transition-delay:0.3s">
+        <div class="h-44 relative overflow-hidden">
+          <img src="img/jardin-crepusculo-tumbonas.jpg" alt="Pinar al atardecer" class="w-full h-full object-cover" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-pine-900/50 to-transparent"></div>
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-xl text-pine-900 font-semibold mb-2">Tierra de Pinares</h3>
+          <p class="text-stone-600 text-sm leading-relaxed">Kilómetros de pinar para recorrer en bici, a caballo o a pie. La naturaleza en su estado más puro.</p>
+          <div class="text-wood-500 text-xs font-medium mt-3">Desde la puerta</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ RESERVAS ══ -->
+<section id="reservas" class="py-20 lg:py-28" style="background:#f4f0e8;">
+  <div class="max-w-3xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-12">
+      <p class="text-wood-500 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Disponibilidad y precios</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-pine-900 font-semibold">Reserva tu estancia</h2>
+      <div class="divider mt-5" style="background:#b07a45;"></div>
+      <p class="text-stone-600 mt-6 max-w-xl mx-auto leading-relaxed">Cuéntanos cuándo queréis venir y cuántos seréis. Os responderemos con disponibilidad y precio en menos de 24h.</p>
+    </div>
+
+    <div class="bg-white rounded shadow-lg overflow-hidden reveal">
+
+      <!-- Cabecera del formulario -->
+      <div class="bg-pine-900 px-8 py-5 flex items-center gap-3">
+        <img src="img/logo.png" alt="" class="h-8 w-auto" style="filter: brightness(0) invert(1);">
+        <div class="ml-1">
+          <div class="text-stone-300 text-sm">Coca, Segovia · Alquiler íntegro · 5 hab · 10 personas</div>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <form id="reservaForm" class="p-8 space-y-5" onsubmit="handleReserva(event)">
+
+        <!-- Fechas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Fecha de llegada</label>
+            <input type="date" name="llegada" required
+              class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 focus:outline-none focus:border-wood-500 focus:ring-1 focus:ring-wood-300">
+          </div>
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Fecha de salida</label>
+            <input type="date" name="salida" required
+              class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 focus:outline-none focus:border-wood-500 focus:ring-1 focus:ring-wood-300">
+          </div>
+        </div>
+
+        <!-- Huéspedes -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Adultos</label>
+            <select name="adultos" class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 focus:outline-none focus:border-wood-500 bg-white">
+              <option>1</option><option>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option><option>8</option>
+              <option>9</option><option>10</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Niños</label>
+            <select name="ninos" class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 focus:outline-none focus:border-wood-500 bg-white">
+              <option>0</option><option>1</option><option>2</option><option>3</option>
+              <option>4</option><option>5</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-pine-900 font-semibold text-sm mb-2">Nombre completo</label>
+          <input type="text" name="nombre" placeholder="Tu nombre y apellidos" required
+            class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 placeholder-stone-400 focus:outline-none focus:border-wood-500 focus:ring-1 focus:ring-wood-300">
+        </div>
+
+        <!-- Email y teléfono -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Email</label>
+            <input type="email" name="email" placeholder="tu@email.com" required
+              class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 placeholder-stone-400 focus:outline-none focus:border-wood-500 focus:ring-1 focus:ring-wood-300">
+          </div>
+          <div>
+            <label class="block text-pine-900 font-semibold text-sm mb-2">Teléfono</label>
+            <input type="tel" name="telefono" placeholder="+34 000 000 000"
+              class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 placeholder-stone-400 focus:outline-none focus:border-wood-500 focus:ring-1 focus:ring-wood-300">
+          </div>
+        </div>
+
+        <!-- Mensaje -->
+        <div>
+          <label class="block text-pine-900 font-semibold text-sm mb-2">Mensaje <span class="text-stone-400 font-normal">(opcional)</span></label>
+          <textarea name="mensaje" rows="3"
+            placeholder="¿Es una ocasión especial? ¿Alguna pregunta? Cuéntanos."
+            class="w-full border border-stone-200 rounded px-4 py-3 text-pine-900 placeholder-stone-400 focus:outline-none focus:border-wood-500 resize-none"></textarea>
+        </div>
+
+        <!-- Botón enviar -->
+        <button type="submit"
+          class="w-full bg-wood-500 hover:bg-wood-600 text-white font-semibold text-base py-4 rounded-sm transition-colors flex items-center justify-center gap-2">
+          Consultar disponibilidad
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <p class="text-stone-400 text-xs text-center">Te responderemos en menos de 24 horas.</p>
+
+      </form>
+
+      <!-- Mensaje de éxito (oculto por defecto) -->
+      <div id="reservaExito" class="hidden p-10 text-center">
+        <div class="text-6xl mb-5">🌲</div>
+        <h3 class="font-display text-2xl text-pine-900 font-semibold mb-3">¡Consulta enviada!</h3>
+        <p class="text-stone-600 leading-relaxed">Gracias por tu interés en Aire de Pinares.<br>Te responderemos antes de 24 horas con toda la información.</p>
+        <button onclick="resetReserva()" class="mt-6 text-wood-500 hover:text-wood-600 text-sm font-medium transition-colors underline">Enviar otra consulta</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CONTACTO ══ -->
+<section id="contacto" class="py-20 lg:py-28 bg-pine-900">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="text-center reveal mb-14">
+      <p class="text-wood-300 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Escríbenos</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-white font-semibold">Contacto y reserva</h2>
+      <div class="divider mt-5"></div>
+    </div>
+
+    <div class="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-start max-w-5xl mx-auto">
+
+      <!-- Datos -->
+      <div class="reveal-left mb-12 lg:mb-0">
+        <p class="text-stone-300 leading-relaxed mb-8">
+          Para consultar disponibilidad, precios o cualquier duda, contáctanos por WhatsApp,
+          teléfono o email. Respondemos en el mismo día.
+        </p>
+
+        <div class="space-y-4 mb-8">
+          <a href="tel:+34646611028" class="flex items-center gap-4 bg-pine-800 hover:bg-pine-700 rounded px-5 py-4 transition-colors card-hover">
+            <span class="text-wood-300 text-2xl">📞</span>
+            <div>
+              <div class="text-white font-semibold">646 61 10 28</div>
+              <div class="text-stone-300 text-sm">Llamadas y WhatsApp</div>
+            </div>
+          </a>
+          <a href="tel:+34669048873" class="flex items-center gap-4 bg-pine-800 hover:bg-pine-700 rounded px-5 py-4 transition-colors card-hover">
+            <span class="text-wood-300 text-2xl">📞</span>
+            <div>
+              <div class="text-white font-semibold">669 04 88 73</div>
+              <div class="text-stone-300 text-sm">Llamadas y WhatsApp</div>
+            </div>
+          </a>
+          <a href="mailto:airedepinares@hotmail.com" class="flex items-center gap-4 bg-pine-800 hover:bg-pine-700 rounded px-5 py-4 transition-colors card-hover">
+            <span class="text-wood-300 text-2xl">✉️</span>
+            <div>
+              <div class="text-white font-semibold">airedepinares@hotmail.com</div>
+              <div class="text-stone-300 text-sm">Correo electrónico</div>
+            </div>
+          </a>
+          <a href="https://www.instagram.com/vutairedepinares" target="_blank"
+             class="flex items-center gap-4 bg-pine-800 hover:bg-pine-700 rounded px-5 py-4 transition-colors card-hover">
+            <span class="text-wood-300 text-2xl">📷</span>
+            <div>
+              <div class="text-white font-semibold">@vutairedepinares</div>
+              <div class="text-stone-300 text-sm">Instagram</div>
+            </div>
+          </a>
+        </div>
+
+        <a href="https://wa.me/34646611028?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20en%20Aire%20de%20Pinares"
+           target="_blank"
+           class="inline-flex w-full items-center justify-center gap-2 bg-wood-500 hover:bg-wood-600 text-white font-semibold px-7 py-4 rounded-sm transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.524 5.824L.057 23.852l6.196-1.624A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.893a9.849 9.849 0 01-5.032-1.374l-.361-.214-3.741.981.998-3.648-.235-.374A9.868 9.868 0 012.107 12C2.107 6.577 6.577 2.107 12 2.107S21.893 6.577 21.893 12 17.423 21.893 12 21.893z"/></svg>
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+
+      <!-- Mapa -->
+      <div class="reveal-right">
+        <div class="rounded-sm overflow-hidden shadow-xl mb-4">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12114.23!2d-4.5201!3d41.2139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3ded56ef6c4f33%3A0x47d90be64e9e3ac8!2sCoca%2C%20Segovia!5e0!3m2!1ses!2ses!4v1234567890"
+            width="100%" height="340" style="border:0;" allowfullscreen="" loading="lazy"
+            title="Coca, Segovia en Google Maps"></iframe>
+        </div>
+        <p class="text-stone-300 text-sm text-center">📍 Coca, Segovia — en la Tierra de Pinares</p>
+
+        <!-- Normas -->
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <div class="bg-pine-800 rounded px-4 py-3 text-center">
+            <div class="text-wood-300 font-semibold text-sm">✅ Entrada 15:00</div>
+          </div>
+          <div class="bg-pine-800 rounded px-4 py-3 text-center">
+            <div class="text-wood-300 font-semibold text-sm">🕙 Salida 10:00</div>
+          </div>
+          <div class="bg-pine-800 rounded px-4 py-3 text-center">
+            <div class="text-stone-300 font-semibold text-sm">⛔ No mascotas</div>
+          </div>
+          <div class="bg-pine-800 rounded px-4 py-3 text-center">
+            <div class="text-stone-300 font-semibold text-sm">⛔ No fumar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FOOTER ══ -->
+<footer class="bg-pine-950 py-12">
+  <div class="max-w-7xl mx-auto px-5 lg:px-10">
+
+    <div class="lg:grid lg:grid-cols-3 lg:gap-12 mb-10">
+      <!-- Marca -->
+      <div class="mb-8 lg:mb-0">
+        <div class="mb-4">
+          <img src="img/logo.png" alt="Aire de Pinares" class="h-9 w-auto" style="filter: brightness(0) invert(1);">
+        </div>
+        <p class="text-stone-300 text-sm leading-relaxed">
+          Vivienda de uso turístico en Coca, Segovia.<br>
+          5 dormitorios · 10 personas · Alquiler íntegro.
+        </p>
+        <div class="mt-4 flex gap-3">
+          <a href="https://www.instagram.com/vutairedepinares" target="_blank"
+             class="text-stone-300 hover:text-white text-sm transition-colors">Instagram</a>
+        </div>
+      </div>
+
+      <!-- Navegación -->
+      <div class="mb-8 lg:mb-0">
+        <p class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Descubrir</p>
+        <div class="space-y-2">
+          <a href="#la-casa" class="block text-stone-300 hover:text-white text-sm transition-colors">La Casa</a>
+          <a href="#jardín" class="block text-stone-300 hover:text-white text-sm transition-colors">El Jardín</a>
+          <a href="#habitaciones" class="block text-stone-300 hover:text-white text-sm transition-colors">Las Habitaciones</a>
+          <a href="#entorno" class="block text-stone-300 hover:text-white text-sm transition-colors">El Entorno</a>
+          <a href="#reservas" class="block text-stone-300 hover:text-white text-sm transition-colors">Reservas</a>
+          <a href="#propietarios" class="block text-stone-300 hover:text-white text-sm transition-colors">Propietarios</a>
+          <a href="#contacto" class="block text-stone-300 hover:text-white text-sm transition-colors">Contacto y Reserva</a>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <div>
+        <p class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Contacto</p>
+        <div class="space-y-2">
+          <a href="tel:+34646611028" class="block text-stone-300 hover:text-white text-sm transition-colors">646 61 10 28</a>
+          <a href="tel:+34669048873" class="block text-stone-300 hover:text-white text-sm transition-colors">669 04 88 73</a>
+          <a href="mailto:airedepinares@hotmail.com" class="block text-stone-300 hover:text-white text-sm transition-colors">airedepinares@hotmail.com</a>
+          <p class="text-stone-600 text-sm">Coca, Segovia</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-pine-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-stone-600 text-xs">© 2024 Aire de Pinares · Coca, Segovia</p>
+      <div class="flex gap-4 text-xs text-stone-600">
+        <a href="aviso-legal.html" class="hover:text-stone-300 transition-colors">Aviso legal</a>
+        <a href="privacidad.html" class="hover:text-stone-300 transition-colors">Privacidad</a>
+        <a href="cookies.html" class="hover:text-stone-300 transition-colors">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── Nav scroll ───────────────────────────────
+  const nav = document.getElementById('main-nav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 60); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ─── Mobile menu ──────────────────────────────
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('icon-open');
+  const iconClose = document.getElementById('icon-close');
+
+  menuBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    iconOpen.classList.toggle('hidden', isOpen);
+    iconClose.classList.toggle('hidden', !isOpen);
+  });
+
+  // Close on link click
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      iconOpen.classList.remove('hidden');
+      iconClose.classList.add('hidden');
+    });
+  });
+
+  // ─── Reveal animations ────────────────────────
+  const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  reveals.forEach(el => revealObs.observe(el));
+
+  // ─── Formulario de reservas (visual) ──────────
+  window.handleReserva = function(e) {
+    e.preventDefault();
+    document.getElementById('reservaForm').classList.add('hidden');
+    document.getElementById('reservaExito').classList.remove('hidden');
+    document.getElementById('reservaExito').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  window.resetReserva = function() {
+    document.getElementById('reservaExito').classList.add('hidden');
+    document.getElementById('reservaForm').classList.remove('hidden');
+    document.getElementById('reservaForm').reset();
+  };
+</script>
+</body>
+</html>
